@@ -1,0 +1,139 @@
+<!-- customers.component.html -->
+<p-toast position="top-right"/>
+
+<div class="page">
+  <h1 class="text-3xl font-bold mb-4">
+    Gestión de <span style="color:var(--gold)">Clientes VIP</span>
+  </h1>
+
+  <!-- Stats -->
+  <div class="grid mb-4">
+    <div class="col-6 md:col-3">
+      <p-card styleClass="text-center">
+        <div class="text-4xl font-bold mb-1">{{ allCustomers.length }}</div>
+        <div class="text-xs text-color-secondary uppercase tracking-widest">Total</div>
+      </p-card>
+    </div>
+    <div class="col-6 md:col-3">
+      <p-card styleClass="text-center">
+        <div class="text-4xl font-bold mb-1" style="color:var(--gold)">{{ vipCustomers.length }}</div>
+        <div class="text-xs text-color-secondary uppercase tracking-widest">VIP</div>
+      </p-card>
+    </div>
+    <div class="col-6 md:col-3">
+      <p-card styleClass="text-center">
+        <div class="text-4xl font-bold mb-1 text-green-400">{{ newVipCustomers.length }}</div>
+        <div class="text-xs text-color-secondary uppercase tracking-widest">Ganaron VIP</div>
+      </p-card>
+    </div>
+    <div class="col-6 md:col-3">
+      <p-card styleClass="text-center">
+        <div class="text-4xl font-bold mb-1 text-red-400">{{ lostVipCustomers.length }}</div>
+        <div class="text-xs text-color-secondary uppercase tracking-widest">Perdieron VIP</div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Filtro por mes -->
+  <p-card styleClass="mb-4">
+    <ng-template #title>
+      <span class="text-sm font-bold uppercase tracking-widest" style="color:var(--gold)">
+        Consultas por Mes
+      </span>
+    </ng-template>
+    <div class="flex flex-wrap gap-3 align-items-end">
+      <div class="flex flex-column gap-1">
+        <label class="text-sm text-color-secondary">Año</label>
+        <p-inputnumber [(ngModel)]="filterYear" [min]="2020" [max]="2099" [useGrouping]="false" inputStyleClass="w-6rem"/>
+      </div>
+      <div class="flex flex-column gap-1">
+        <label class="text-sm text-color-secondary">Mes</label>
+        <p-inputnumber [(ngModel)]="filterMonth" [min]="1" [max]="12" [useGrouping]="false" inputStyleClass="w-4rem"/>
+      </div>
+      <p-button label="Ganaron VIP" icon="pi pi-arrow-up" severity="success" (onClick)="loadNewVip()"/>
+      <p-button label="Perdieron VIP" icon="pi pi-arrow-down" severity="danger" [outlined]="true" (onClick)="loadLostVip()"/>
+      <p-button label="Recalcular" icon="pi pi-refresh" [outlined]="true" (onClick)="recalculate()"/>
+    </div>
+  </p-card>
+
+  <!-- Ganaron VIP -->
+  @if (filterQueried) {
+    <p-card styleClass="mb-4">
+      <ng-template #title>
+        <span class="text-sm font-bold uppercase tracking-widest text-green-400">
+          ↑ Ganaron VIP — {{ filterMonth }}/{{ filterYear }}
+        </span>
+      </ng-template>
+      @if (newVipCustomers.length === 0) {
+        <p class="text-color-secondary py-2">Ningún cliente ganó VIP ese mes</p>
+      }
+      @if (newVipCustomers.length > 0) {
+        <p-table [value]="newVipCustomers" styleClass="p-datatable-sm">
+          <ng-template #header>
+            <tr><th>Nombre</th><th>Email</th></tr>
+          </ng-template>
+          <ng-template #body let-c>
+            <tr>
+              <td class="text-green-400 font-medium">
+                <i class="pi pi-arrow-up mr-2"></i>{{ c.name }}
+              </td>
+              <td class="text-color-secondary">{{ c.email }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+    </p-card>
+
+    <!-- Perdieron VIP -->
+    <p-card styleClass="mb-4">
+      <ng-template #title>
+        <span class="text-sm font-bold uppercase tracking-widest text-red-400">
+          ↓ Perdieron VIP — {{ filterMonth }}/{{ filterYear }}
+        </span>
+      </ng-template>
+      @if (lostVipCustomers.length === 0) {
+        <p class="text-color-secondary py-2">Ningún cliente perdió VIP ese mes</p>
+      }
+      @if (lostVipCustomers.length > 0) {
+        <p-table [value]="lostVipCustomers" styleClass="p-datatable-sm">
+          <ng-template #header>
+            <tr><th>Nombre</th><th>Email</th></tr>
+          </ng-template>
+          <ng-template #body let-c>
+            <tr>
+              <td class="text-red-400 font-medium">
+                <i class="pi pi-arrow-down mr-2"></i>{{ c.name }}
+              </td>
+              <td class="text-color-secondary">{{ c.email }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+    </p-card>
+  }
+
+  <!-- Todos los clientes -->
+  <p-card>
+    <ng-template #title>
+      <span class="text-sm font-bold uppercase tracking-widest" style="color:var(--gold)">
+        Todos los Clientes
+      </span>
+    </ng-template>
+    <p-table [value]="allCustomers" styleClass="p-datatable-sm p-datatable-striped">
+      <ng-template #header>
+        <tr><th>#</th><th>Nombre</th><th>Email</th><th>Estado</th></tr>
+      </ng-template>
+      <ng-template #body let-c>
+        <tr>
+          <td class="text-color-secondary">{{ c.id }}</td>
+          <td>{{ c.name }}</td>
+          <td class="text-color-secondary">{{ c.email }}</td>
+          <td>
+            <p-tag [value]="c.vip ? '⭐ VIP' : 'Común'"
+                   [severity]="c.vip ? 'warn' : 'secondary'"/>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

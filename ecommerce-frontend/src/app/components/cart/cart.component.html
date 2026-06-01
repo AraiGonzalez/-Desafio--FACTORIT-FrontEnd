@@ -1,0 +1,181 @@
+<!-- cart.component.html -->
+<p-toast position="top-right"/>
+
+<div class="page">
+  <h1 class="text-3xl font-bold mb-4">
+    Carrito de <span style="color:var(--gold)">Compras</span>
+  </h1>
+
+  <!-- Crear carrito -->
+  <p-card styleClass="mb-4">
+    <ng-template #title>
+      <span class="text-sm font-bold tracking-widest uppercase"
+            style="color:var(--gold)">Nuevo Carrito</span>
+    </ng-template>
+    <div class="flex flex-wrap gap-3 align-items-end">
+
+      <div class="flex flex-column gap-1 flex-1" style="min-width:200px">
+        <label class="text-sm text-color-secondary">Cliente</label>
+        <p-select
+          [(ngModel)]="selectedCustomer"
+          [options]="customers"
+          optionLabel="name"
+          placeholder="Seleccionar cliente"
+          class="w-full">
+          <ng-template let-c #item>
+            {{ c.name }} {{ c.vip ? '⭐' : '' }}
+          </ng-template>
+        </p-select>
+      </div>
+
+      <div class="flex flex-column gap-1 flex-1" style="min-width:180px">
+        <label class="text-sm text-color-secondary">Fecha simulada (opcional)</label>
+        <input pInputText type="date" [(ngModel)]="simulatedDate" class="w-full"/>
+      </div>
+
+      <p-button
+        label="Crear Carrito"
+        icon="pi pi-plus"
+        [disabled]="!selectedCustomer"
+        (onClick)="createCart()"/>
+
+    </div>
+  </p-card>
+
+  <!-- Carrito activo -->
+  @if (currentCart) {
+    <p-card styleClass="mb-4">
+
+      <ng-template #title>
+        <div class="flex justify-content-between align-items-center">
+          <div class="flex align-items-center gap-3">
+            <span class="text-xl font-semibold">Carrito #{{ currentCart.cartId }}</span>
+            <p-tag [value]="typeLabel(currentCart.cartType)"
+                   [severity]="typeSeverity(currentCart.cartType)"/>
+          </div>
+          <p-button
+            label="Eliminar"
+            icon="pi pi-trash"
+            severity="danger"
+            [outlined]="true"
+            size="small"
+            (onClick)="deleteCart()"/>
+        </div>
+        <p class="text-sm text-color-secondary mt-1">
+          Cliente: <strong>{{ currentCart.customerName }}</strong>
+          &nbsp;·&nbsp; Estado: {{ currentCart.status }}
+        </p>
+      </ng-template>
+
+      <p-divider/>
+
+      <!-- Agregar producto -->
+      <div class="flex flex-wrap gap-3 align-items-end mb-4">
+        <div class="flex flex-column gap-1 flex-1" style="min-width:200px">
+          <label class="text-sm text-color-secondary">Producto</label>
+          <p-select
+            [(ngModel)]="selectedProduct"
+            [options]="products"
+            optionLabel="name"
+            placeholder="Seleccionar producto"
+            class="w-full">
+            <ng-template let-p #item>
+              {{ p.name }} — ${{ p.price | number:'1.0-0' }}
+            </ng-template>
+          </p-select>
+        </div>
+
+        <div class="flex flex-column gap-1" style="width:100px">
+          <label class="text-sm text-color-secondary">Cantidad</label>
+          <p-inputnumber [(ngModel)]="quantity" [min]="1" [showButtons]="true"
+                         buttonLayout="horizontal"
+                         decrementButtonIcon="pi pi-minus"
+                         incrementButtonIcon="pi pi-plus"
+                         inputStyleClass="w-4rem text-center"/>
+        </div>
+
+        <p-button
+          label="Agregar"
+          icon="pi pi-plus"
+          [disabled]="!selectedProduct"
+          (onClick)="addProduct()"/>
+      </div>
+
+      <!-- Tabla de items -->
+      @if (currentCart.items.length > 0) {
+        <p-table [value]="currentCart.items" styleClass="p-datatable-sm">
+          <ng-template #header>
+            <tr>
+              <th>Producto</th>
+              <th>Precio unit.</th>
+              <th style="width:160px">Cantidad</th>
+              <th>Subtotal</th>
+              <th style="width:60px"></th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-item>
+            <tr>
+              <td>{{ item.product.name }}</td>
+              <td class="text-color-secondary">${{ item.product.price | number:'1.0-0' }}</td>
+              <td>
+                <div class="flex align-items-center gap-2">
+                  <p-button icon="pi pi-minus" [text]="true" size="small"
+                            (onClick)="removeOneUnit(item.product.id)"/>
+                  <span class="font-bold w-2rem text-center">{{ item.quantity }}</span>
+                  <p-button icon="pi pi-plus" [text]="true" size="small"
+                            (onClick)="addOneUnit(item.product.id)"/>
+                </div>
+              </td>
+              <td style="color:var(--gold); font-weight:600">
+                ${{ item.product.price * item.quantity | number:'1.0-0' }}
+              </td>
+              <td>
+                <p-button icon="pi pi-times" [text]="true" severity="danger" size="small"
+                          (onClick)="removeProduct(item.product.id)"
+                          pTooltip="Eliminar producto"/>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+
+      @if (currentCart.items.length === 0) {
+        <div class="text-center py-5 text-color-secondary">
+          <i class="pi pi-shopping-cart text-5xl mb-3 block opacity-30"></i>
+          <p>El carrito está vacío</p>
+        </div>
+      }
+
+      <!-- Resumen de precios -->
+      @if (currentCart.items.length > 0) {
+        <p-divider/>
+        <div class="flex flex-column gap-1" style="max-width:400px; margin-left:auto">
+          <div class="price-row">
+            <span class="text-color-secondary">Subtotal sin descuentos</span>
+            <span>${{ currentCart.subtotal | number:'1.2-2' }}</span>
+          </div>
+          @if (currentCart.totalDiscount > 0) {
+            <div class="price-row discount">
+              <span><i class="pi pi-tag mr-1"></i>Descuentos aplicados</span>
+              <span>− ${{ currentCart.totalDiscount | number:'1.2-2' }}</span>
+            </div>
+          }
+          <div class="price-row total">
+            <span>Total a pagar</span>
+            <span>${{ currentCart.total | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <p-divider/>
+        <p-button
+          label="Finalizar Compra"
+          icon="pi pi-check-circle"
+          class="w-full"
+          styleClass="w-full p-button-lg"
+          [disabled]="currentCart.items.length === 0"
+          (onClick)="checkout()"/>
+      }
+
+    </p-card>
+  }
+</div>

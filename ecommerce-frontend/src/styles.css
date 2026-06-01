@@ -1,0 +1,110 @@
+/* PrimeNG base */
+@import "primeflex/primeflex.css";
+@import "primeicons/primeicons.css";
+
+/* Solo variables propias — no hay que luchar contra la librería */
+:root {
+  --gold:        #c9a84c;
+  --gold-border: rgba(201,168,76,0.3);
+  --gold-dim:    rgba(201,168,76,0.12);
+  --green:       #4caf82;
+  --red:         #e05c5c;
+  --blue:        #5b8dee;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: var(--font-family);
+}
+
+/* Layout general */
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  animation: fadeUp 0.3s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Chips de estado — estos sí son propios del negocio */
+.chip-vip {
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid var(--gold-border);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.chip-common {
+  background: rgba(155,151,160,0.1);
+  color: #9b97a0;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.chip-special {
+  background: rgba(91,141,238,0.12);
+  color: var(--blue);
+  border: 1px solid rgba(91,141,238,0.25);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.chip-gained {
+  background: rgba(76,175,130,0.12);
+  color: var(--green);
+  border: 1px solid rgba(76,175,130,0.25);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.chip-lost {
+  background: rgba(224,92,92,0.1);
+  color: var(--red);
+  border: 1px solid rgba(224,92,92,0.2);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+/* Price summary */
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  font-size: 0.875rem;
+}
+
+.price-row.discount { color: var(--green); }
+
+.price-row.total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--gold-border);
+}
+
+.price-row.total span:last-child {
+  color: var(--gold);
+  font-size: 1.3rem;
+}
